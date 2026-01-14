@@ -1,0 +1,1587 @@
+<!DOCTYPE html>
+<html lang="vi" class="antialiased">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workspace - NguyenDucManh</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        glass: {
+                            100: 'rgba(255, 255, 255, 0.1)',
+                            200: 'rgba(255, 255, 255, 0.2)',
+                            300: 'rgba(255, 255, 255, 0.3)',
+                            border: 'rgba(255, 255, 255, 0.2)',
+                        },
+                        dark: {
+                            bg: '#0f172a',
+                            surface: '#1e293b',
+                            border: '#334155'
+                        }
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-out',
+                        'slide-up': 'slideUp 0.5s ease-out',
+                        'bounce-slow': 'bounce 3s infinite',
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(20px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            min-height: 100vh;
+            transition: background-color 0.5s ease, color 0.5s ease;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        #universe-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 1s ease;
+            pointer-events: none;
+            z-index: 0;
+        }
+        #universe-container.active {
+            opacity: 1;
+        }
+
+        body.light-theme {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            color: #1e293b;
+        }
+        
+        body.dark-theme {
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #312e81 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            color: #f8fafc;
+        }
+        
+        body.universe-theme {
+            background: #050505;
+            color: #e2e8f0;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(30px) saturate(200%);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 
+                0 8px 32px 0 rgba(31, 38, 135, 0.15),
+                inset 0 1px 0 0 rgba(255, 255, 255, 0.4),
+                0 0 80px rgba(147, 51, 234, 0.1);
+        }
+        
+        .dark-theme .glass-panel {
+            background: rgba(30, 41, 59, 0.4);
+            border: 2px solid rgba(139, 92, 246, 0.3);
+            box-shadow: 
+                0 8px 32px 0 rgba(0, 0, 0, 0.4),
+                inset 0 1px 0 0 rgba(255, 255, 255, 0.1),
+                0 0 80px rgba(139, 92, 246, 0.2);
+        }
+
+        .universe-theme .glass-panel {
+            background: rgba(10, 10, 20, 0.5);
+            border: 2px solid rgba(124, 58, 237, 0.5);
+            box-shadow: 
+                0 0 40px rgba(124, 58, 237, 0.3),
+                inset 0 0 20px rgba(124, 58, 237, 0.1);
+        }
+
+        @keyframes rainbowText {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .logo-text {
+            background: linear-gradient(90deg, #667eea, #764ba2, #f093fb, #f5576c, #ffd89b);
+            background-size: 300% 300%;
+            animation: rainbowText 5s ease infinite;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            filter: drop-shadow(0 0 20px rgba(147, 51, 234, 0.3));
+        }
+
+        .custom-scrollbar::-webkit-scrollbar { width: 8px; }
+        .custom-scrollbar::-webkit-scrollbar-track { 
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { 
+            background: linear-gradient(135deg, #764ba2 0%, #f093fb 100%);
+            box-shadow: 0 0 10px rgba(147, 51, 234, 0.5);
+        }
+
+        .card-item {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .card-item:hover::before {
+            left: 100%;
+        }
+
+        .card-item:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 
+                0 20px 40px -10px rgba(0, 0, 0, 0.2),
+                0 0 30px rgba(147, 51, 234, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.4);
+        }
+
+        .universe-theme .card-item:hover {
+            box-shadow: 
+                0 0 30px rgba(139, 92, 246, 0.5),
+                0 0 60px rgba(139, 92, 246, 0.3),
+                inset 0 0 20px rgba(139, 92, 246, 0.2);
+            border-color: rgba(139, 92, 246, 0.8);
+        }
+
+        .column-header {
+            background: linear-gradient(135deg, rgba(147, 51, 234, 0.1) 0%, rgba(79, 70, 229, 0.1) 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .column-header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #667eea, #764ba2, #f093fb);
+            background-size: 200% 200%;
+            animation: gradientShift 3s ease infinite;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            box-shadow: 
+                0 4px 15px rgba(102, 126, 234, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 
+                0 8px 25px rgba(102, 126, 234, 0.6),
+                inset 0 1px 0 rgba(255, 255, 255, 0.4);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            box-shadow: 
+                0 4px 15px rgba(245, 87, 108, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 
+                0 8px 25px rgba(245, 87, 108, 0.6),
+                inset 0 1px 0 rgba(255, 255, 255, 0.4);
+        }
+
+        .theme-toggle {
+            position: relative;
+            transition: all 0.3s;
+        }
+
+        .theme-toggle:hover {
+            transform: rotate(20deg) scale(1.1);
+            filter: drop-shadow(0 0 15px rgba(147, 51, 234, 0.6));
+        }
+
+        .theme-toggle::after {
+            content: '';
+            position: absolute;
+            inset: -5px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #667eea, #764ba2, #f093fb);
+            opacity: 0;
+            z-index: -1;
+            transition: opacity 0.3s;
+            filter: blur(10px);
+        }
+
+        .theme-toggle:hover::after {
+            opacity: 0.6;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.6; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
+        }
+
+        .animate-float {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .gradient-badge {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            box-shadow: 0 0 10px rgba(102, 126, 234, 0.2);
+        }
+
+        .file-icon-pdf { 
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+        }
+        .file-icon-doc { 
+            background: linear-gradient(135deg, #4dabf7 0%, #228be6 100%);
+        }
+        .file-icon-img { 
+            background: linear-gradient(135deg, #51cf66 0%, #37b24d 100%);
+        }
+        .file-icon-default { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .link-icon { 
+            background: linear-gradient(135deg, #20c997 0%, #12b886 100%);
+        }
+
+        .drag-over {
+            border-style: dashed !important;
+            border-width: 3px !important;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%) !important;
+            border-color: #6366f1 !important;
+            box-shadow: 
+                0 0 30px rgba(99, 102, 241, 0.3),
+                inset 0 0 20px rgba(99, 102, 241, 0.1) !important;
+        }
+
+        .resize-handle {
+            position: absolute;
+            background: transparent;
+            z-index: 10;
+            transition: all 0.3s;
+        }
+
+        .resize-handle-right {
+            right: -3px;
+            top: 0;
+            bottom: 0;
+            width: 6px;
+            cursor: ew-resize;
+        }
+
+        .resize-handle-bottom {
+            left: 0;
+            right: 0;
+            bottom: -3px;
+            height: 6px;
+            cursor: ns-resize;
+        }
+
+        .resize-handle-corner {
+            right: -3px;
+            bottom: -3px;
+            width: 12px;
+            height: 12px;
+            cursor: nwse-resize;
+        }
+
+        .resize-handle:hover {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.5) 0%, rgba(139, 92, 246, 0.5) 100%);
+            box-shadow: 0 0 15px rgba(99, 102, 241, 0.6);
+        }
+
+        .resizing {
+            user-select: none;
+            pointer-events: none;
+        }
+
+        .add-item-btn {
+            border: 2px dashed rgba(147, 51, 234, 0.3);
+            transition: all 0.4s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .add-item-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(147, 51, 234, 0.1);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .add-item-btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .add-item-btn:hover {
+            border-color: #667eea;
+            color: #667eea;
+            box-shadow: 
+                0 0 20px rgba(102, 126, 234, 0.3),
+                inset 0 0 15px rgba(102, 126, 234, 0.1);
+        }
+
+        .watermark {
+            background: linear-gradient(135deg, rgba(147, 51, 234, 0.05) 0%, rgba(79, 70, 229, 0.05) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -1000px 0; }
+            100% { background-position: 1000px 0; }
+        }
+
+        .shimmer {
+            background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.3) 50%, transparent 100%);
+            background-size: 1000px 100%;
+            animation: shimmer 3s infinite;
+        }
+
+        .save-indicator {
+            position: fixed;
+            top: 100px;
+            right: 32px;
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 600;
+            display: none;
+            z-index: 1000;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .save-indicator.success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+        }
+
+        .save-indicator.error {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .loading-spinner {
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="light-theme transition-colors duration-500">
+    <div id="universe-container"></div>
+    
+    <div class="save-indicator" id="saveIndicator"></div>
+    
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="fixed inset-0 z-[999] bg-black/50 backdrop-blur-sm flex items-center justify-center" style="display: none;">
+        <div class="text-center">
+            <div class="loading-spinner mx-auto mb-4"></div>
+            <p class="text-white font-semibold">Loading workspace...</p>
+        </div>
+    </div>
+    
+    <div class="relative z-10 flex flex-col h-screen overflow-hidden">
+        <header class="glass-panel sticky top-0 z-50 px-8 py-4 border-b-0 m-4 rounded-2xl mb-0">
+            <div class="max-w-[1600px] mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+                <div class="flex items-center gap-6">
+                    <div class="flex flex-col">
+                        <h1 class="text-2xl font-extrabold tracking-tight logo-text">
+                            NGUYENDUCMANH
+                        </h1>
+                        <div class="flex items-center gap-2 text-xs font-semibold opacity-70 uppercase tracking-widest mt-1">
+                            <span id="current-time" class="tabular-nums">00:00</span>
+                            <span class="w-1 h-1 rounded-full bg-current animate-pulse"></span>
+                            <span id="weather-info">HÀ NỘI</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex items-center gap-4">
+                    <button onclick="window.AppManager.toggleTheme()" 
+                        class="theme-toggle p-2.5 rounded-full glass-panel hover:scale-110 transition-transform active:scale-95 group relative overflow-hidden">
+                        <span id="theme-icon" class="relative z-10 text-lg">🌙</span>
+                    </button>
+                    
+                    <div class="flex items-center gap-4 glass-panel px-5 py-2 rounded-2xl">
+                        <div class="flex items-center gap-3">
+                            <div id="greeting-icon" class="text-xl">👋</div>
+                            <div class="hidden sm:block">
+                                <p class="text-sm font-bold leading-none" id="greeting-text">Welcome back</p>
+                                <p class="text-[10px] font-medium opacity-70 mt-1" id="greeting-sub">Loading...</p>
+                            </div>
+                        </div>
+                        <div class="w-px h-8 bg-current opacity-10 mx-2 hidden sm:block"></div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="window.AppManager.addColumn()" 
+                                class="btn-primary text-white px-4 py-2 rounded-xl text-xs font-bold transition-all hover:-translate-y-0.5 active:translate-y-0 flex items-center gap-2" title="Add Column">
+                                <span class="text-sm">+</span> Column
+                            </button>
+                            <button onclick="window.AppManager.removeColumn()" 
+                                class="btn-danger text-white px-4 py-2 rounded-xl text-xs font-bold transition-all hover:-translate-y-0.5 active:translate-y-0 flex items-center gap-2" title="Remove Column">
+                                <span class="text-sm">−</span> Column
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main class="flex-1 overflow-x-auto overflow-y-hidden p-4 md:p-8">
+            <div id="board" class="flex h-full gap-6 max-w-[1600px] mx-auto min-w-max pb-4">
+                <!-- Columns will be rendered here -->
+            </div>
+        </main>
+
+        <div class="fixed bottom-6 right-8 pointer-events-none z-0 opacity-10 select-none">
+            <div class="text-4xl font-black tracking-tighter uppercase watermark">Workspace</div>
+        </div>
+    </div>
+
+    <!-- File Modal -->
+    <div id="openFileModal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity" onclick="window.AppManager.closeModal()"></div>
+        <div class="relative w-full max-w-md bg-white dark:bg-slate-800 rounded-3xl shadow-2xl overflow-hidden transform transition-all scale-100 p-6 border border-white/10">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-xl font-bold dark:text-white">File Details</h3>
+                <button onclick="window.AppManager.closeModal()" class="p-2 hover:bg-black/5 dark:hover:bg-white/5 rounded-full transition-colors">
+                    ✕
+                </button>
+            </div>
+            
+            <div class="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-xl mb-6 border border-slate-100 dark:border-slate-700/50">
+                <p class="text-sm text-slate-500 dark:text-slate-400 font-medium mb-1">Filename</p>
+                <p class="text-base font-semibold text-slate-800 dark:text-slate-200 break-all" id="modal-filename">example.txt</p>
+            </div>
+
+            <div class="space-y-3">
+                <button onclick="window.AppManager.viewFileContent()" 
+                    class="w-full py-3.5 bg-gradient-to-r from-indigo-600 to-violet-600 text-white rounded-xl font-bold shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2">
+                    <span>👁️</span> View Content
+                </button>
+                <button onclick="window.AppManager.downloadFile()" 
+                    class="w-full py-3.5 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-700 dark:text-white rounded-xl font-bold hover:bg-slate-50 dark:hover:bg-slate-600 transition-all flex items-center justify-center gap-2">
+                    <span>💾</span> Download
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import * as THREE from "https://cdn.skypack.dev/three@0.136.0";
+        
+        const AppManager = {
+            columns: [],
+            currentFileData: null,
+            draggedCard: null,
+            universeScene: null,
+            currentThemeIndex: 0,
+            resizing: null,
+            isLoading: false,
+            lastLocalUpdate: 0,
+
+            // 🔧 FIX: chống spam save
+            saveLock: false,
+            manualSaveOnly: true,   // 🔒 chỉ cho phép lưu thủ công
+
+            THEMES: ['light', 'dark', 'universe'],
+            FIREBASE_URL:
+      'https://workspace-data-67037-default-rtdb.asia-southeast1.firebasedatabase.app/workspaces/public.json',
+
+
+            init() {
+                console.log('🚀 Initializing Workspace with Firebase...');
+                this.showLoading(true);
+                this.loadFromFirebase();
+                this.initTheme();
+                this.updateGreeting();
+                this.updateWeather();
+                this.setupSecretSaveShortcut();
+                
+                setInterval(() => this.updateGreeting(), 1000);
+                setInterval(() => this.updateWeather(), 60000);
+                setInterval(() => this.autoLoadFromFirebase(), 300000);
+                
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape') this.closeModal();
+                });
+            },
+
+            showLoading(show) {
+                this.isLoading = show;
+                const overlay = document.getElementById('loadingOverlay');
+                if (overlay) overlay.style.display = show ? 'flex' : 'none';
+            },
+
+            showSaveIndicator(success, message = '') {
+                const indicator = document.getElementById('saveIndicator');
+                if (!indicator) return;
+                
+                indicator.className = `save-indicator ${success ? 'success' : 'error'}`;
+                indicator.textContent = message || (success ? 'Changes Saved' : 'Save Failed');
+                indicator.style.display = 'block';
+                
+                setTimeout(() => {
+                    indicator.style.display = 'none';
+                }, 2000);
+            },
+
+            async loadFromFirebase() {
+                try {
+                    const response = await fetch(this.FIREBASE_URL);
+
+                    if (!response.ok) {
+                        throw new Error('HTTP error ' + response.status);
+                    }
+
+                    const data = await response.json();
+
+                    if (data && Array.isArray(data.columns)) {
+
+                        // 🔧 FIX LỖI THIẾU cards
+                        this.columns = data.columns.map(col => ({
+                            name: col.name || 'Untitled',
+                            width: col.width || 320,
+                            height: col.height || 600,
+                            cards: Array.isArray(col.cards) ? col.cards : []
+                        }));
+
+                        this.lastLocalUpdate = data.lastUpdated || Date.now();
+
+                        this.render();
+                        console.log('✅ Loaded data from Firebase');
+                    }
+                    else {
+                        console.log('⚠️ No data found, using default');
+                        this.columns = [
+                            {   
+                                name: "To Do", 
+                                cards: [{ title: "Welcome to Workspace!", type: "note", updatedAt: new Date().toLocaleDateString() }],
+                                width: 320,
+                                height: 600 
+                            }
+                        ];
+                    }
+                    this.render();
+                } catch (error) {
+                    console.error('❌ Load error:', error);
+
+                    // fallback data (KHÔNG BAO GIỜ CRASH)
+                    this.columns = [{
+                        name: 'To Do',
+                        width: 320,
+                        height: 600,
+                        cards: []
+                    }];
+
+                    this.render();
+                    this.showSaveIndicator(false, 'Using local data');
+                } finally {
+                    this.showLoading(false);
+                }
+            },
+
+            // 🔧 FIX 5: không reload khi đang drag / resize
+            async autoLoadFromFirebase() {
+                if (document.hidden) return;
+                if (this.resizing || this.draggedCard) return;
+                await this.loadFromFirebase();
+            },
+
+
+            // 🔧 FIX HOÀN CHỈNH: chống spam save
+            async saveToFirebase(force = false) {
+
+                // ❌ chặn mọi auto-save
+                if (this.manualSaveOnly && !force) {
+                    console.log('⏸️ Auto save blocked');
+                    return;
+                }
+
+                if (this.saveLock) return;
+                this.saveLock = true;
+
+                try {
+                    this.lastLocalUpdate = Date.now();
+
+                    await fetch(this.FIREBASE_URL, {
+                        method: 'PATCH',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            columns: this.columns,
+                            lastUpdated: this.lastLocalUpdate
+                        })
+                    });
+
+                    this.showSaveIndicator(true);
+                    console.log('✅ Saved to Firebase');
+                } catch (error) {
+                    console.error('❌ Save error:', error);
+                    this.showSaveIndicator(false);
+                } finally {
+                    setTimeout(() => this.saveLock = false, 500);
+                }
+            },
+            readFileAsBase64(file) {
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = () => {
+                        const base64 = reader.result.split(',')[1];
+
+                        const mime = file.type || (
+                            file.name.endsWith('.pdf') ? 'application/pdf' :
+                            file.name.match(/\.(jpg|jpeg|png|gif)$/i) ? 'image/jpeg' :
+                            'application/octet-stream'
+                        );
+
+                        resolve(`data:${mime};base64,${base64}`);
+                    };
+                    reader.readAsDataURL(file);
+
+                });
+            },
+            setupSecretSaveShortcut() {
+                document.addEventListener('keydown', (e) => {
+
+                    // 🔧 FIX 6: Ctrl + Shift + M
+                    // Ctrl + Shift + M
+                    if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'm') {
+                        e.preventDefault();
+
+                        // 🔹 NEW: sync code file lên GitHub
+                        if (this.currentCard?.type === 'code') {
+                            syncFileToGitHub(this.currentCard);
+                        }
+
+                        // 🔹 GIỮ NGUYÊN
+                        this.saveToFirebase(true);
+                    }
+
+                });
+
+            },
+
+            addColumn() {
+                const name = prompt("Enter column name:", "New Column");
+                if (name) {
+                    this.columns.push({ name, cards: [], width: 320, height: 600 });
+                    this.render();
+                    //this.saveToFirebase();
+                }
+            },
+
+            removeColumn() {
+                if (this.columns.length > 0 && confirm("Remove last column?")) {
+                    this.columns.pop();
+                    this.render();
+                    //this.saveToFirebase();
+                }
+            },
+
+            editColumnName(cIdx) {
+                const newName = prompt("Edit column name:", this.columns[cIdx].name);
+                if (newName) {
+                    this.columns[cIdx].name = newName;
+                    this.render();
+                    //this.saveToFirebase();
+                }
+            },
+
+            async addCardToCol(cIdx) {
+
+                const isFile = confirm(
+                    "OK = Upload FILE\nCancel = Add LINK"
+                );
+
+                // ===== UPLOAD FILE =====
+                if (isFile) {
+                    const input = document.createElement('input');
+                    input.type = 'file';
+
+                    input.onchange = async () => {
+                        const file = input.files[0];
+                        if (!file) return;
+
+                        const base64 = await this.readFileAsBase64(file);
+
+                        this.columns[cIdx].cards.unshift({
+                            title: file.name,
+                            type: 'file',
+                            fileData: base64,
+                            fileType: file.type,
+                            fileSize: file.size,
+                            updatedAt: new Date().toLocaleDateString(),
+                            githubPath: `src/${file.name}`
+                        });
+
+                        this.render();
+                    };
+
+                    input.click();
+                    return;
+                }
+
+                // ===== ADD LINK =====
+                const url = prompt("Enter URL:");
+                if (!url) return;
+
+                this.columns[cIdx].cards.unshift({
+                    title: url,
+                    type: 'link',
+                    url,
+                    updatedAt: new Date().toLocaleDateString()
+                });
+
+                this.render();
+            },
+
+            deleteCard(cIdx, kIdx) {
+                if (confirm("Delete this item?")) {
+                    this.columns[cIdx].cards.splice(kIdx, 1);
+                    this.render();
+                    //this.saveToFirebase();
+                }
+            },
+
+            editCardTitle(cIdx, kIdx) {
+                const newTitle = prompt("Edit title:", this.columns[cIdx].cards[kIdx].title);
+                if (newTitle) {
+                    this.columns[cIdx].cards[kIdx].title = newTitle;
+                    this.render();
+                    //this.saveToFirebase();
+                }
+            },
+
+            handleCardClick(cIdx, kIdx) {
+                const card = this.columns[cIdx].cards[kIdx];
+                this.currentFileData = card;
+
+                if (card.type === 'link') {
+                    this.openLink(card.title);
+                    return;
+                }
+
+                if (card.type === 'file') {
+                    if (this.isEditableFile(card)) {
+                        this.openFileEditor(card);   // ✅ editor nội bộ
+                    } else {
+                        this.previewFile(card);      // ✅ pdf / image
+                    }
+                }
+            },
+
+
+            // ===== CLICK / DOUBLE CLICK =====
+            clickTimer: null,
+
+            handleSingleClick(e, cIdx, kIdx) {
+                e.stopPropagation();
+                clearTimeout(this.clickTimer);
+
+                this.clickTimer = setTimeout(() => {
+                    const card = this.columns[cIdx].cards[kIdx];
+                    this.currentFileData = card;
+
+                    if (card.type === 'link') {
+                        this.openLink(card.title);
+                        return;
+                    }
+
+                    if (card.type === 'file') {
+                        if (this.isEditableFile(card)) {
+                            this.openFileEditor(card);   // ✅ CLICK 1 LẦN = EDIT
+                        } else {
+                            this.openFile(card);         // ✅ PDF / IMAGE
+                        }
+                    }
+                }, 200);
+            },
+
+
+
+            handleDoubleClick(e, cIdx, kIdx) {
+                e.stopPropagation();
+                clearTimeout(this.clickTimer);
+
+                const card = this.columns[cIdx].cards[kIdx];
+                this.currentFileData = card;
+
+                if (card.type === 'file') {
+                    this.downloadFile();
+                }
+            },
+
+            viewFileContent() {
+                const card = this.currentFileData;
+                if (!card) return;
+
+                if (card.type === 'link') {
+                    window.open(card.title, '_blank');
+                }
+                else if (card.type === 'file' && card.fileData) {
+                    window.open(card.fileData, '_blank');
+                }
+                else {
+                    alert('Preview not available');
+                }
+            },
+
+
+            downloadFile() {
+                const card = this.currentFileData;
+                if (!card || !card.fileData) return;
+
+                const a = document.createElement('a');
+                a.href = card.fileData;
+                a.download = card.title || 'download';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            },
+
+
+            closeModal() {
+                const overlay = document.getElementById('openFileModal');
+                if (overlay) {
+                    overlay.classList.add('hidden');
+                    overlay.classList.remove('flex');
+                }
+                this.currentFileData = null;
+            },
+
+            initTheme() {
+                const savedTheme = localStorage.getItem('workspace_theme') || 'light';
+                this.currentThemeIndex = this.THEMES.indexOf(savedTheme);
+                if (this.currentThemeIndex === -1) this.currentThemeIndex = 0;
+                this.applyTheme(this.THEMES[this.currentThemeIndex]);
+                this.autoSwitchTheme();
+            },
+
+            toggleTheme() {
+                this.currentThemeIndex = (this.currentThemeIndex + 1) % this.THEMES.length;
+                const newTheme = this.THEMES[this.currentThemeIndex];
+                this.applyTheme(newTheme);
+                localStorage.setItem('workspace_theme', newTheme);
+            },
+
+            applyTheme(theme) {
+                document.body.className = `${theme}-theme transition-colors duration-500`;
+                this.updateThemeIcon(theme);
+                
+                if (theme === 'universe') {
+                    this.initUniverseTheme();
+                } else {
+                    this.destroyUniverseTheme();
+                }
+            },
+
+            updateThemeIcon(theme) {
+                const icons = {'light': '🌙', 'dark': '🌌', 'universe': '☀️'};
+                const icon = document.getElementById('theme-icon');
+                if (icon) icon.innerText = icons[theme] || '🌙';
+            },
+
+            autoSwitchTheme() {
+                const savedTheme = localStorage.getItem('workspace_theme');
+                if (!savedTheme) {
+                    const hour = new Date().getHours();
+                    if (hour >= 18 || hour < 6) {
+                        this.currentThemeIndex = 1;
+                        this.applyTheme('dark');
+                    } else {
+                        this.currentThemeIndex = 0;
+                        this.applyTheme('light');
+                    }
+                }
+            },
+
+            initUniverseTheme() {
+                if (this.universeScene) return;
+                
+                const container = document.getElementById('universe-container');
+                if (!container) return;
+                
+                container.classList.add('active');
+                
+                const scene = new THREE.Scene();
+                scene.background = new THREE.Color(0x050505);
+                
+                const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 1000);
+                camera.position.set(0, 4, 40);
+                
+                const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+                container.appendChild(renderer.domElement);
+                
+                let gu = { time: { value: 0 } };
+                let sizes = [];
+                let shift = [];
+                
+                const pushShift = () => {
+                    shift.push(
+                        Math.random() * Math.PI,
+                        Math.random() * Math.PI * 2,
+                        (Math.random() * 0.9 + 0.1) * Math.PI * 0.1,
+                        Math.random() * 0.9 + 0.1
+                    );
+                };
+                
+                let pts = new Array(25000).fill().map(() => {
+                    sizes.push(Math.random() * 1.5 + 0.5);
+                    pushShift();
+                    return new THREE.Vector3()
+                        .randomDirection()
+                        .multiplyScalar(Math.random() * 0.5 + 9.5);
+                });
+                
+                for (let i = 0; i < 50000; i++) {
+                    let r = 10.0;
+                    let R = 40.0;
+                    let rand = Math.pow(Math.random(), 1.5);
+                    let radius = Math.sqrt(R * R * rand + (1 - rand) * r * r);
+                    
+                    pts.push(
+                        new THREE.Vector3().setFromCylindricalCoords(
+                            radius,
+                            Math.random() * 2 * Math.PI,
+                            (Math.random() - 0.5) * 2
+                        )
+                    );
+                    sizes.push(Math.random() * 1.5 + 0.5);
+                    pushShift();
+                }
+                
+                const g = new THREE.BufferGeometry().setFromPoints(pts);
+                g.setAttribute("sizes", new THREE.Float32BufferAttribute(sizes, 1));
+                g.setAttribute("shift", new THREE.Float32BufferAttribute(shift, 4));
+                
+                const m = new THREE.PointsMaterial({
+                    size: 0.15,
+                    transparent: true,
+                    depthTest: false,
+                    blending: THREE.AdditiveBlending,
+                    onBeforeCompile: (shader) => {
+                        shader.uniforms.time = gu.time;
+                        shader.vertexShader = `
+                            uniform float time;
+                            attribute float sizes;
+                            attribute vec4 shift;
+                            varying vec3 vColor;
+                            ${shader.vertexShader}
+                        `.replace(
+                            `gl_PointSize = size;`,
+                            `gl_PointSize = size * sizes;`
+                        ).replace(
+                            `#include <color_vertex>`,
+                            `#include <color_vertex>
+                            float d = length(abs(position) / vec3(40., 10., 40));
+                            d = clamp(d, 0., 1.);
+                            vColor = mix(vec3(227., 155., 0.), vec3(100., 50., 255.), d) / 255.;
+                            `
+                        ).replace(
+                            `#include <begin_vertex>`,
+                            `#include <begin_vertex>
+                            float t = time;
+                            float moveT = mod(shift.x + shift.z * t, 6.283185);
+                            float moveS = mod(shift.y + shift.z * t, 6.283185);
+                            transformed += vec3(
+                                cos(moveS) * sin(moveT),
+                                cos(moveT),
+                                sin(moveS) * sin(moveT)
+                            ) * shift.a;
+                            `
+                        );
+                        
+                        shader.fragmentShader = `
+                            varying vec3 vColor;
+                            ${shader.fragmentShader}
+                        `.replace(
+                            `#include <clipping_planes_fragment>`,
+                            `#include <clipping_planes_fragment>
+                            float d = length(gl_PointCoord.xy - 0.5);
+                            `
+                        ).replace(
+                            `vec4 diffuseColor = vec4( diffuse, opacity );`,
+                            `vec4 diffuseColor = vec4( vColor, smoothstep(0.5, 0.1, d));`
+                        );
+                    }
+                });
+                
+                const p = new THREE.Points(g, m);
+                p.rotation.order = "ZYX";
+                p.rotation.z = 0.2;
+                scene.add(p);
+                
+                const clock = new THREE.Clock();
+                let animationId;
+                
+                const animate = () => {
+                    if (!this.universeScene) return;
+                    animationId = requestAnimationFrame(animate);
+                    
+                    const t = clock.getElapsedTime() * 0.5;
+                    gu.time.value = t * Math.PI;
+                    p.rotation.y = t * 0.05;
+                    
+                    renderer.render(scene, camera);
+                };
+                
+                const handleResize = () => {
+                    camera.aspect = window.innerWidth / window.innerHeight;
+                    camera.updateProjectionMatrix();
+                    renderer.setSize(window.innerWidth, window.innerHeight);
+                };
+                
+                window.addEventListener('resize', handleResize);
+                
+                this.universeScene = {
+                    scene, camera, renderer, animate, handleResize, container, animationId
+                };
+                
+                animate();
+            },
+
+            destroyUniverseTheme() {
+                if (this.universeScene) {
+                    const { handleResize, container, animationId } = this.universeScene;
+                    window.removeEventListener('resize', handleResize);
+                    if (animationId) cancelAnimationFrame(animationId);
+                    if (container) {
+                        container.classList.remove('active');
+                        container.innerHTML = '';
+                    }
+                    this.universeScene = null;
+                }
+            },
+
+            updateWeather() {
+                const weatherEl = document.getElementById('weather-info');
+                if (!weatherEl) return;
+                
+                const now = new Date();
+                const month = now.getMonth() + 1;
+                
+                const tempByMonth = {
+                    1: [12, 18], 2: [13, 19], 3: [16, 23], 4: [20, 28],
+                    5: [24, 33], 6: [26, 35], 7: [26, 34], 8: [26, 33],
+                    9: [24, 31], 10: [21, 28], 11: [17, 24], 12: [13, 20]
+                };
+                
+                const range = tempByMonth[month] || [20, 25];
+                const temp = Math.floor(Math.random() * (range[1] - range[0] + 1)) + range[0];
+                
+                const conditions = ['Sunny', 'Cloudy', 'Clear', 'Rainy', 'Mist'];
+                const cond = conditions[Math.floor(Math.random() * conditions.length)];
+                
+                weatherEl.innerText = `HÀ NỘI • ${temp}°C • ${cond}`;
+            },
+
+            updateGreeting() {
+                const now = new Date();
+                const hours = now.getHours();
+                const minutes = now.getMinutes();
+                const timeString = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+                
+                const timeEl = document.getElementById('current-time');
+                if (timeEl) timeEl.innerText = timeString;
+                
+                const greetEl = document.getElementById('greeting-text');
+                const subEl = document.getElementById('greeting-sub');
+                const iconEl = document.getElementById('greeting-icon');
+                
+                if (greetEl) {
+                    let greet = 'Good Morning';
+                    let sub = 'Have a productive day!';
+                    let icon = '🌅';
+                    
+                    if (hours >= 12 && hours < 18) {
+                        greet = 'Good Afternoon';
+                        sub = 'Keep up the momentum!';
+                        icon = '☀️';
+                    } else if (hours >= 18) {
+                        greet = 'Good Evening';
+                        sub = 'Time to relax or focus.';
+                        icon = '🌙';
+                    }
+                    
+                    greetEl.innerText = greet;
+                    if (!this.isLoading) {
+                        subEl.innerText = sub;
+                    }
+                    iconEl.innerText = icon;
+                }
+            },
+            openLink(url) {
+                if (!url) return;
+                let link = url.trim();
+                if (!/^https?:\/\//i.test(link)) {
+                    link = 'https://' + link;
+                }
+                window.open(link, '_blank', 'noopener');
+            },
+
+            openFile(card) {
+                if (!card || !card.fileData) return;
+
+                // Nếu đã là http / https (vd Firebase Storage)
+                if (card.fileData.startsWith('http')) {
+                    window.open(card.fileData, '_blank');
+                    return;
+                }
+
+                // Base64 -> Blob
+                const [meta, base64] = card.fileData.split(',');
+                if (!base64) return;
+
+                let mime = 'application/octet-stream';
+
+                const match = meta.match(/data:(.*?);base64/);
+                if (match) mime = match[1];
+
+                // Ép MIME cho HTML
+                if (card.title?.endsWith('.html') || mime.includes('html')) {
+                    mime = 'text/html; charset=utf-8';
+                }
+
+                const binary = atob(base64);
+                const len = binary.length;
+                const buffer = new Uint8Array(len);
+
+                for (let i = 0; i < len; i++) {
+                    buffer[i] = binary.charCodeAt(i);
+                }
+
+                const blob = new Blob([buffer], { type: mime });
+                const blobUrl = URL.createObjectURL(blob);
+
+                window.open(blobUrl, '_blank');
+
+                setTimeout(() => URL.revokeObjectURL(blobUrl), 60000);
+            },
+            openInVSCodeWeb(card) {
+                if (!card || !card.rawUrl) {
+                    alert("File code chưa có URL public");
+                    return;
+                }
+
+                const url = `https://vscode.dev/?file=${encodeURIComponent(card.rawUrl)}`;
+                window.open(url, "_blank");
+            },
+
+            openFileEditor(card) {
+                if (!card || !card.fileData) return;
+
+                // 🚫 bảo vệ: không cho PDF / IMAGE
+                if (!this.isEditableFile(card)) {
+                    this.openFile(card);
+                    return;
+                }
+
+                let modal = document.getElementById('codeEditorModal');
+                if (!modal) {
+                    modal = document.createElement('div');
+                    modal.id = 'codeEditorModal';
+                    modal.className = 'fixed inset-0 z-[200] bg-black/70 flex items-center justify-center';
+
+                    modal.innerHTML = `
+                    <div class="bg-slate-900 w-[90%] max-w-4xl h-[80vh] rounded-2xl flex flex-col overflow-hidden">
+                        <div class="flex justify-between items-center px-4 py-2 bg-slate-800 text-white">
+                            <span class="font-bold text-sm">📝 Code Editor</span>
+                            <button id="closeEditor">✕</button>
+                        </div>
+
+                        <textarea id="editorArea"
+                            class="flex-1 bg-slate-900 text-emerald-300 p-4 font-mono text-sm resize-none outline-none"></textarea>
+
+                        <div class="px-4 py-2 text-xs text-slate-400 bg-slate-800">
+                            Lưu Firebase trước khi thoát
+                        </div>
+                    </div>
+                    `;
+
+                    document.body.appendChild(modal);
+
+                    modal.querySelector('#closeEditor').onclick = () => modal.remove();
+                }
+
+                // base64 → text
+                const base64 = card.fileData.split(',')[1];
+                const text = decodeURIComponent(escape(atob(base64)));
+
+                const textarea = modal.querySelector('#editorArea');
+                textarea.value = text;
+
+                // ❌ KHÔNG auto save
+                textarea.oninput = () => {
+                    console.log('✏️ editing locally, not saved');
+                };
+
+                // ✅ Ctrl + Shift + M = save
+                modal.onkeydown = (e) => {
+                    if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'm') {
+                        e.preventDefault();
+
+                        const newText = textarea.value;
+                        card.fileData =
+                            'data:text/plain;base64,' +
+                            btoa(unescape(encodeURIComponent(newText)));
+
+                        card.updatedAt = new Date().toLocaleDateString();
+
+                        this.saveToFirebase(true);
+                    }
+                };
+            },
+
+
+
+            handleDragStart(e, cIdx, kIdx) {
+                this.draggedCard = { cIdx, kIdx };
+                e.currentTarget.classList.add('opacity-50', 'scale-95');
+                e.dataTransfer.effectAllowed = 'move';
+            },
+
+            handleDragEnd(e) {
+                e.currentTarget.classList.remove('opacity-50', 'scale-95');
+                document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
+            },
+
+            handleDragOver(e) {
+                if (e.preventDefault) e.preventDefault();
+                e.dataTransfer.dropEffect = 'move';
+                return false;
+            },
+
+            handleDragEnter(e, cIdx) {
+                e.currentTarget.classList.add('drag-over');
+            },
+
+            handleDragLeave(e) {
+                e.currentTarget.classList.remove('drag-over');
+            },
+
+            handleDrop(e, targetCIdx) {
+                if (e.stopPropagation) e.stopPropagation();
+                e.currentTarget.classList.remove('drag-over');
+
+                if (this.draggedCard && this.draggedCard.cIdx !== targetCIdx) {
+                    const card = this.columns[this.draggedCard.cIdx].cards[this.draggedCard.kIdx];
+                    this.columns[this.draggedCard.cIdx].cards.splice(this.draggedCard.kIdx, 1);
+                    this.columns[targetCIdx].cards.unshift(card);
+                    this.render();
+                    // this.saveToFirebase();
+                }
+                this.draggedCard = null;
+                return false;
+            },
+
+            getFileIconClass(fileName, type) {
+                if (type === 'link') return 'link-icon';
+                
+                const ext = fileName.split('.').pop().toLowerCase();
+                if (['pdf'].includes(ext)) return 'file-icon-pdf';
+                if (['doc', 'docx', 'txt'].includes(ext)) return 'file-icon-doc';
+                if (['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp'].includes(ext)) return 'file-icon-img';
+                return 'file-icon-default';
+            },
+
+            isEditableFile(card) {
+                if (!card || !card.title) return false;
+
+                const editableExt = [
+                    'txt', 'md', 'js', 'ts', 'html', 'css',
+                    'json', 'xml', 'yml', 'yaml', 'py', 'java'
+                ];
+
+                const ext = card.title.split('.').pop().toLowerCase();
+                return editableExt.includes(ext);
+            },
+
+            startResize(e, cIdx, type) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                this.resizing = {
+                    cIdx,
+                    type,
+                    startX: e.clientX,
+                    startY: e.clientY,
+                    startWidth: this.columns[cIdx].width,
+                    startHeight: this.columns[cIdx].height
+                };
+
+                document.body.classList.add('resizing');
+                document.addEventListener('mousemove', this.handleResize);
+                document.addEventListener('mouseup', this.stopResize);
+            },
+
+            handleResize(e) {
+                if (!window.AppManager.resizing) return;
+                
+                const { cIdx, type, startX, startY, startWidth, startHeight } = window.AppManager.resizing;
+                const deltaX = e.clientX - startX;
+                const deltaY = e.clientY - startY;
+
+                if (type === 'right' || type === 'corner') {
+                    const newWidth = Math.max(200, Math.min(800, startWidth + deltaX));
+                    window.AppManager.columns[cIdx].width = newWidth;
+                }
+
+                if (type === 'bottom' || type === 'corner') {
+                    const newHeight = Math.max(300, Math.min(1200, startHeight + deltaY));
+                    window.AppManager.columns[cIdx].height = newHeight;
+                }
+
+                window.AppManager.render();
+            },
+
+            stopResize() {
+                if (window.AppManager.resizing) {
+                    document.body.classList.remove('resizing');
+                    document.removeEventListener('mousemove', window.AppManager.handleResize);
+                    document.removeEventListener('mouseup', window.AppManager.stopResize);
+                    window.AppManager.resizing = null;
+                    // window.AppManager.saveToFirebase();
+                }
+            },
+
+            render() {
+                const board = document.getElementById('board');
+                if (!board) return;
+                
+                if (!this.columns || this.columns.length === 0) {
+                    board.innerHTML = '<div class="text-center w-full py-20"><p class="text-2xl font-bold opacity-50">No columns yet. Click "+ Column" to get started!</p></div>';
+                    return;
+                }
+                
+                board.innerHTML = this.columns.map((col, cIdx) => `
+                    <div class="glass-panel rounded-2xl p-0 flex flex-col shrink-0 transition-all duration-200 ease-in-out relative"
+                         style="width: ${col.width}px; height: ${col.height}px;"
+                         ondragover="window.AppManager.handleDragOver(event)" 
+                         ondragenter="window.AppManager.handleDragEnter(event, ${cIdx})"
+                         ondragleave="window.AppManager.handleDragLeave(event)"
+                         ondrop="window.AppManager.handleDrop(event, ${cIdx})">
+                        
+                        <div class="resize-handle resize-handle-right" 
+                             onmousedown="window.AppManager.startResize(event, ${cIdx}, 'right')"></div>
+                        <div class="resize-handle resize-handle-bottom" 
+                             onmousedown="window.AppManager.startResize(event, ${cIdx}, 'bottom')"></div>
+                        <div class="resize-handle resize-handle-corner" 
+                             onmousedown="window.AppManager.startResize(event, ${cIdx}, 'corner')"></div>
+                        
+                        <div class="column-header p-5 border-b border-white/10 flex justify-between items-center">
+                            <h3 onclick="window.AppManager.editColumnName(${cIdx})" 
+                                class="font-bold text-sm tracking-wide uppercase hover:text-indigo-300 cursor-pointer transition-colors flex items-center gap-2">
+                                ${col.name}
+                                <span class="opacity-40 hover:opacity-100 text-[10px]">✎</span>
+                            </h3>
+                            <span class="gradient-badge px-2.5 py-1 rounded-md text-[10px] font-bold">
+                                ${col.cards.length}
+                            </span>
+                        </div>
+                        
+                        <div class="p-3 space-y-2 overflow-y-auto custom-scrollbar flex-1 min-h-0">
+                            <button onclick="window.AppManager.addCardToCol(${cIdx})" 
+                                class="add-item-btn w-full py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 group relative">
+                                <span class="group-hover:scale-125 transition-transform relative z-10">+</span>
+                                <span class="relative z-10">Add Item</span>
+                            </button>
+
+                            ${col.cards.map((card, kIdx) => {
+                                const iconClass = window.AppManager.getFileIconClass(card.title, card.type);
+                                return `
+                                <div draggable="true" 
+                                     ondragstart="window.AppManager.handleDragStart(event, ${cIdx}, ${kIdx})"
+                                     ondragend="window.AppManager.handleDragEnd(event)"
+                                     onclick="window.AppManager.handleSingleClick(event, ${cIdx}, ${kIdx})"
+                                     ondblclick="window.AppManager.handleDoubleClick(event, ${cIdx}, ${kIdx})"
+
+                                     class="card-item bg-white dark:bg-slate-800/80 p-2.5 rounded-lg border border-slate-200 dark:border-slate-700 cursor-pointer group relative">
+                                     
+                                     <div class="absolute top-0 left-0 w-1 h-full ${card.type === 'file' ? 'bg-gradient-to-b from-indigo-500 to-purple-500' : 'bg-gradient-to-b from-emerald-500 to-teal-500'} opacity-0 group-hover:opacity-100 transition-opacity"></div>
+
+                                    <div class="flex items-center gap-2">
+                                        <div class="p-1.5 rounded-md ${iconClass} text-white shrink-0 shadow-lg">
+                                            ${card.type === 'file' ? 
+                                                '<svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>' : 
+                                                '<svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>'}
+                                        </div>
+                                        
+                                        <div class="flex-1 min-w-0">
+                                            <h4 onclick="event.stopPropagation(); window.AppManager.editCardTitle(${cIdx}, ${kIdx})" 
+                                                class="font-semibold text-slate-800 dark:text-slate-200 text-xs leading-tight hover:text-transparent hover:bg-clip-text hover:bg-gradient-to-r hover:from-indigo-500 hover:to-purple-500 transition-all truncate" title="${card.title}">
+    ${card.title}
+    </h4>
+    <div class="flex items-center gap-2 mt-0.5">
+    <span class="text-[9px] font-medium text-slate-400 uppercase tracking-wide">
+    ${card.updatedAt || 'Recent'}
+    </span>
+    <span class="text-slate-300 text-[9px] font-bold">
+    ${card.fileSize ? (card.fileSize / 1024).toFixed(0) + 'KB' : '🔗'}
+    </span>
+    </div>
+    </div>
+                                        <button onclick="event.stopPropagation(); window.AppManager.deleteCard(${cIdx}, ${kIdx})" 
+                                            class="opacity-0 group-hover:opacity-100 p-1 hover:bg-red-50 dark:hover:bg-red-900/20 text-red-400 hover:text-red-500 rounded transition-all shrink-0" title="Delete">
+                                            <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            `;}).join('')}
+                        </div>
+                    </div>
+                `).join('');
+            }
+        };
+
+        window.AppManager = AppManager;
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => AppManager.init());
+        } else {
+            AppManager.init();
+        }
+        async function syncFileToGitHub(card) {
+    if (!card || card.type !== 'code') return;
+    if (!card.githubPath || !card.fileData) return;
+
+    const GITHUB_OWNER = 'YOUR_USERNAME';
+    const GITHUB_REPO  = 'YOUR_REPO';
+    const BRANCH = 'main';
+
+    const content = card.fileData.split(',')[1]; // base64
+    const url = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${card.githubPath}`;
+
+    // lấy sha nếu file đã tồn tại
+    let sha = undefined;
+    try {
+        const r = await fetch(url);
+        if (r.ok) {
+            const j = await r.json();
+            sha = j.sha;
+        }
+    } catch {}
+
+    await fetch(url, {
+        method: 'PUT',
+        headers: {
+            'Accept': 'application/vnd.github+json'
+            // repo public → KHÔNG CẦN TOKEN
+        },
+        body: JSON.stringify({
+            message: `sync from board: ${card.title || card.githubPath}`,
+            content,
+            branch: BRANCH,
+            sha
+        })
+    });
+
+    console.log('✅ Synced to GitHub:', card.githubPath);
+}
+
+    </script>
+
+</body>
+</html>
